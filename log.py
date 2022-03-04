@@ -6,7 +6,7 @@ import operator
 import os
 import ctypes
 import sys
-
+from pathlib import Path
 
 import win32api
 import win32con
@@ -75,41 +75,22 @@ def setFolderPath(files):
 	if not os.path.exists(appPath+'/'+day):
 		os.makedirs(appPath+'/'+day)
 	
-	files['Latest'] = os.path.normpath(appPath + '/latest.log')
-	files['allTaskChanges'] = os.path.normpath(appPath + '/' + day + '/allTaskChanges.log')
-	files['15minSummary'] = os.path.normpath(appPath + '/' + day + '/15minuteSummary.log')
-	files['Summary'] = os.path.normpath(appPath + '/' + day + '/dailySummary.log')
+	files['Latest'] = os.path.join(os.sep, appPath, 'latest.log')
+	files['allTaskChanges'] = os.path.join(os.sep, appPath, day, 'allTaskChanges.log')
+	files['15minSummary'] = os.path.join(os.sep, appPath, day, '15minuteSummary.log')
+	files['Summary'] = os.path.join(os.sep, appPath, day, 'dailySummary.log')
 
-	try:
-		file = open(files['Latest'], 'r')
-	except IOError:
-		with open(files['Latest'],"w") as file:
-			file.write("000 Error")
-	file.close()
-
-	try:
-		file = open(files['allTaskChanges'], 'r')
-	except IOError:
-		with open(files['allTaskChanges'],"w") as file:
-			file.write("")
-	file.close()
-
-	try:
-		file = open(files['15minSummary'], 'r')
-	except IOError:
-		with open(files['15minSummary'],"w") as file:
-			file.write("")
-	file.close()
-
-	try:
-		file = open(files['Summary'], 'r')
-	except IOError:
-		with open(files['Summary'],"w") as file:
-			file.write("")
-	file.close()
+	for key in files:
+		open_or_create(key)
 	
+def open_or_create(filename: str):
 
-	
+	filePath = Path(filename)
+	filePath.touch(exist_ok=True)
+	fileHandle = open(filePath)
+	fileHandle.close()
+	#return fileHandle
+
 def isSystemLocked():
 	user32 = ctypes.windll.User32
 	OpenDesktop = user32.OpenDesktopW #OpenDesktopA 
@@ -137,13 +118,22 @@ setFolderPath(files)
 
 #pdb.set_trace()
 
+# try:
+# 	latest = open(r"c:\Users\m_wat\LogHours\latest",'w')
+# 	latest.write("some text")
+# except Exception as e:
+# 	print(e)
+# finally:
+# 	latest.close()
 
 try:
-	file = open(files['Latest'], 'r')
-except IOError:
-	with open(files['Latest'],"w") as file:
-		file.write("Error Reading File")
-file.close()
+	fileHandle = open(files['Latest'], 'r')
+except Exception as e:
+	print(e)
+# except IOError:
+# 	with open(files['Latest'],"w") as fileHandle:
+# 		fileHandle.write("Error Reading File")
+fileHandle.close()
 
 while True:
 	
