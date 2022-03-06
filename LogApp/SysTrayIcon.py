@@ -11,6 +11,7 @@ For now, the demo at the bottom shows how to use it...'''
          
 import os
 import sys
+import subprocess
 import win32api
 import win32con
 import win32gui_struct
@@ -227,6 +228,14 @@ if __name__ == '__main__':
     hover_text = "SysTrayIcon.py Demo"
     def hello(sysTrayIcon): print("Hello World.")
     def simon(sysTrayIcon): print("Hello Simon.")
+    def openFolder(sysTrayIcon): 
+        '''Open the folder where the log files are stored'''
+        path = "C:/Users/" + os.getlogin() + "/LogHours"
+        path = os.path.normpath(path)
+        FILEBROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')
+        subprocess.run([FILEBROWSER_PATH, path])
+
+    def open15MinuteSummary(sysTrayIcon): print("Using Notepad, open today's 15 Minute Summary Log")
     def switch_icon(sysTrayIcon):
         sysTrayIcon.icon = next(icons)
         sysTrayIcon.refresh_icon()
@@ -234,7 +243,9 @@ if __name__ == '__main__':
                     ('Switch Icon', None, switch_icon),
                     ('A sub-menu', next(icons), (('Say Hello to Simon', next(icons), simon),
                                                   ('Switch Icon', next(icons), switch_icon),
-                                                 ))
+                                                 )),
+                    ('Open LogHours Folder', None, openFolder),
+                    ('Open 15 minute summary', None, open15MinuteSummary)
                    )
     def bye(sysTrayIcon): print('Bye, then.')
     
