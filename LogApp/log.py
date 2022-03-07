@@ -44,7 +44,11 @@ class LogHours(object):
 		self.scanTime = 60 #SECONDS BETWEEN UPDATES
 		self.previousTitle=""
 		self.last15scans={}
-		self.files={'Temp':'','Hours':'','15minSummary':'','Summary':''}
+		self.files={'15minSummary':'',
+					'allTaskChanges':'',
+					'Hours':'',
+					'Summary':'', 
+					'Temp':''}
 		self.setFolderPath()
 		self.lineList = ''
 
@@ -169,7 +173,7 @@ class LogHours(object):
 	def getTimes(self):
 		'''GET THE LAST RECORDED TIME, AND THE CURRENT TIME, AND THE DIFFERENCE'''
 		try:
-			self.lastTime=str(self.lineList[-1]).split(' ')[0]
+			self.lastTime=str(self.lineList[-1]).split(' ')[3]
 			if not self.lastTime.isnumeric():
 				oneHourAgo = time.time() - (60*60)
 				self.lastTime = str(oneHourAgo).split('.')[0]
@@ -224,7 +228,7 @@ class LogHours(object):
 		'''CHECK FOR A TIME DISCREPENCY (Like when the program has crashed for a long time, and is restarted)'''
 		if (self.difference)>(self.scanTime*2):
 			self.setFolderPath()
-			self.appendToLog('Started at: ' + str(self.currentTime)+ '  ' + self.readableTime + "\n", self.title, self.previousTitle)
+			self.appendToLog('Started at: ' + str(self.currentTime)+ '  ' + self.readableTime + ' -------' + " RESTART\n")
 			#previousTitle = title
 
 	def checkForTaskChangeAndLock(self):
