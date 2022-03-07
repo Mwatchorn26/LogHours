@@ -133,27 +133,49 @@ class LogHours(object):
 
 	def getData(self):
 		'''GET THE SYSTEM DATA WE NEED TO DO OUR JOB'''
-		self.readInLatestInfo()
+		#self.readInLatestInfo() #REMOVED (yes I know git can track this)
+		self.readInAllChanges() #ADDED
 		self.getTimes()
 		self.getActiveWindowTitle()
-		self.readableTime = time.strftime('(%Y-%m-%d %H:%M:%S)', time.localtime(float(currentTime)))
+		self.readableTime = time.strftime('(%Y-%m-%d %H:%M:%S)', time.localtime(float(self.currentTime)))
 	
 	def readInLatestInfo(self):
 		'''READ IN THE PREVIOUS INFO'''
+		# try:
+		# 	fileHandle = open(self.files['Latest'],"r")
+		# 	LatestInfo = fileHandle.readlines()
+		# except:
+		# 	print('EXCEPTION:')
+		# 	print("title: %s" % self.title)
+		# 	print("Unexpected error:", sys.exc_info()[0])
+		# finally:
+		# 	fileHandle.close()
+		# self.lineList = LatestInfo
+		pass
+	
+	def readInAllChanges(self):
+		'''READ IN THE PREVIOUS INFO'''
 		try:
-			fileHandle = open(self.files['Latest'],"r")
-			LatestInfo = fileHandle.readlines()
+			fileHandle = open(self.files['allTaskChanges'],"r")
+			allTaskChanges = fileHandle.readlines()
 		except:
 			print('EXCEPTION:')
 			print("title: %s" % self.title)
 			print("Unexpected error:", sys.exc_info()[0])
 		finally:
 			fileHandle.close()
-		self.lineList = LatestInfo
+		self.lineList = allTaskChanges
 
 	def getTimes(self):
 		'''GET THE LAST RECORDED TIME, AND THE CURRENT TIME, AND THE DIFFERENCE'''
-		self.lastTime=str(self.lineList[-1]).split(' ')[0]
+		try:
+			self.lastTime=str(self.lineList[-1]).split(' ')[0]
+			if not self.lastTime.isnumeric():
+				oneHourAgo = time.time() - (60*60)
+				self.lastTime = str(oneHourAgo).split('.')[0]
+		except:
+			oneHourAgo = time.time() - (60*60)
+			self.lastTime = str(oneHourAgo).split('.')[0]
 		#lastTime=str(lineList).split(' ')[0]
 		#print("Last Time: %s" % lastTime)
 		

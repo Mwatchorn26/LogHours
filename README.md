@@ -5,10 +5,8 @@ A day's summary is provided where each application is listed once with the cumul
 
 This was meant to help me keep track of what I did each day so I could record it on my timesheets.
 
-
-
-# TODO:
+## TODO:
 * Tie in mouse and keyboard actions to ensure you're actually interacting with the computer.
 
-# KNOWN ISSUES:
+## KNOWN ISSUES:
 * There is no attempt made to identify an application that is left open while you walk away and talk to your colleague, so beware of that. 
