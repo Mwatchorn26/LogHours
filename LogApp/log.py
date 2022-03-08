@@ -17,6 +17,7 @@ import win32evtlogutil
 class LogHours(object):
 	def __init__(self):
 		self.cleanBrowser = True
+		self.title = 'unassigned'
 
 	def EventLogReportEvent(self):
 		'''
@@ -51,6 +52,7 @@ class LogHours(object):
 					'Temp':''}
 		self.setFolderPath()
 		self.lineList = ''
+		self.title = 'unassigned'
 
 	def summarizeToday(self):
 		'''WRITE OUT A SUMMARY OF TODAY'S ACTIVIES, GROUPING INTO 15 MINUTE SEGMENTS'''
@@ -173,8 +175,10 @@ class LogHours(object):
 	def getTimes(self):
 		'''GET THE LAST RECORDED TIME, AND THE CURRENT TIME, AND THE DIFFERENCE'''
 		try:
-			self.lastTime=str(self.lineList[-1]).split(' ')[3]
-			if not self.lastTime.isnumeric():
+			last_line_in_file = str(self.lineList[-1])
+			time_in_ticks = last_line_in_file.split(' ')[3] # 4th item in the string
+			self.lastTime = time_in_ticks
+			if not self.lastTime[:-2].isnumeric():
 				oneHourAgo = time.time() - (60*60)
 				self.lastTime = str(oneHourAgo).split('.')[0]
 		except:
@@ -183,7 +187,7 @@ class LogHours(object):
 		#lastTime=str(lineList).split(' ')[0]
 		#print("Last Time: %s" % lastTime)
 		
-		#GET THE CURRENT TIME
+		#GET THE CURRENT TIME (ignore the decimal values, hence the splice)
 		self.currentTime=str(time.time()).split('.')[0]
 		#print("Current Time: %r" % currentTime)
 
@@ -234,7 +238,7 @@ class LogHours(object):
 	def checkForTaskChangeAndLock(self):
 		'''CHECK FOR A CHANGE IN TASKS'''
 		if (self.previousTitle != self.title):
-			self.appendToLog(str(self.currentTime) + '  ' + self.readableTime + ' Window:' + self.title + "\n")
+			self.appendToLog(str(self.currentTime) + '  ' + self.readableTime + ' Window: ' + self.title + "\n")
 			#previousTitle = title
 			if self.isSystemLocked():
 				time.sleep(self.scanTime)
@@ -257,7 +261,7 @@ class LogHours(object):
 			#print("\nPast 15 minutes, main task:%r\n" % mainTask)
 			self.last15scans={} #clear the scratch pad used to track the last 15 scans.
 			with open(self.files['15minSummary'],"a") as log:
-				log.write(str(self.currentTime)+ '  ' + self.readableTime + ' Window:' + self.mainTask + "\n")
+				log.write(str(self.currentTime)+ '  ' + self.readableTime + ' Window: ' + self.mainTask + "\n")
 				log.close()
 			
 			sys.stdout.write("-")
@@ -267,7 +271,7 @@ class LogHours(object):
 		'''WRITE THE LATEST VALUES TO TEMPORARY FILE'''
 		with open(self.files['Latest'],"w") as temp:
 			try:
-				temp.write(str(self.currentTime)+ '  ' + self.readableTime + ' Window:' + self.title)
+				temp.write(str(self.currentTime)+ '  ' + self.readableTime + ' Window: ' + self.title)
 			except:
 				print('EXCEPTION:')
 				print("title: %r" % self.title)

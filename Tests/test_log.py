@@ -2,6 +2,8 @@
 from LogApp.log import LogHours
 import pytest
 import os
+import time
+import inspect
 
 # Fixtures
 
@@ -15,7 +17,14 @@ def logHours_internal_vars(logHours):
     logHours.initializeInternalVariables()
     return LogHours()
 
-
+def setup_for_appendToLog(logHours, name_of_test):
+    currentTime_test=str(time.time()).split('.')[0]
+    ONE_HOUR = 60*60
+    logHours.currentTime=str(float(currentTime_test) - ONE_HOUR)
+    logHours.readableTime = time.strftime('(%Y-%m-%d %H:%M:%S)', time.localtime(float(logHours.currentTime)))
+    logHours.title = name_of_test
+    sample_text = name_of_test + '_pyTest at: ' + str(logHours.currentTime)+ ' ' + logHours.readableTime + ' Window: ' + logHours.title + "\n"
+    return sample_text
 
 #Tests
 def test_initializeInternalVariables(logHours):
@@ -30,6 +39,8 @@ def test_initializeInternalVariables(logHours):
     #assert LogHours.files=={'Temp':'','Hours':'','15minSummary':'','Summary':''}
     #assert LogHours.setFolderPath() Asserted in it's own Test function.
     assert logHours.lineList == ''
+    assert logHours.title == 'unassigned'
+    
 
 @pytest.mark.skip(reason="broken, and you'd have to send Win+L command to lock the system")
 def test_isSystemLocked(logHours):
@@ -149,28 +160,24 @@ def test_appendToLog(logHours):
     import time
     import inspect
     #Prepare...
-    full_text = """Mary had a little lamb.
-    Who's fleece was white as snow.\n"""    
+    full_text = f"""Mary had a little lamb.
+    Who's fleece was white as snow. Window: {logHours.title} \n"""
+    print(full_text)
     logHours.initializeInternalVariables()
     #should have been done in intitializeInternalvariables: logHours.setFolderPath()
     p = Path(logHours.files['allTaskChanges'])
     p.write_text("Mary had a little lamb.\n")
-    logHours.title = "testing...123"
 
     #Run appendToLog
-    logHours.appendToLog("    Who's fleece was white as snow.\n")
+    logHours.appendToLog("    Who's fleece was white as snow. Window: " + logHours.title + " \n")
     
     #Examine the result
     assert p.read_text() == full_text
 
     #Append proper data
-    #GET THE CURRENT TIME
     name_of_test = inspect.stack()[0][3]
-    currentTime_test=str(time.time()).split('.')[0]
-    logHours.currentTime=currentTime_test
-    logHours.readableTime = time.strftime('(%Y-%m-%d %H:%M:%S)', time.localtime(float(logHours.currentTime)))
-    pyTest_lastTime = name_of_test + ' pyTest at: ' + str(logHours.currentTime)+ '  ' + logHours.readableTime + "\n"
-    logHours.appendToLog(pyTest_lastTime)
+    sample_text = setup_for_appendToLog(logHours, name_of_test)
+    logHours.appendToLog(sample_text)
 
 def test_getActiveWindowTitle(logHours):
     '''Compare [expected] hard-coded expected value to [actual] code result. Test title expected'''
@@ -184,21 +191,23 @@ def test_checkForRestart(logHours):
     from pathlib import Path
     import inspect
     import time
+
     #Setup for assertion 1
     logHours.initializeInternalVariables()
     #should have been done in intitializeInternalVariables: logHours.setFolderPath()
     #logHours.readInLatestInfo() #REMOVED
     logHours.readInAllChanges() #ADDED
     logHours.getTimes()
-    # sample_text = "-------- TESTING checkForRestart -----"
-    # logHours.title = "TITLE_checkForRestart_TITLE"
+
     name_of_test = inspect.stack()[0][3]
-    currentTime_test=str(time.time()).split('.')[0]
-    ONE_HOUR = 60*60
-    logHours.currentTime=str(float(currentTime_test) - ONE_HOUR)
-    logHours.readableTime = time.strftime('(%Y-%m-%d %H:%M:%S)', time.localtime(float(logHours.currentTime)))
-    sample_text = name_of_test + ' pyTest at: ' + str(logHours.currentTime)+ '  ' + logHours.readableTime + "\n"
-    logHours.title = name_of_test
+    sample_text = setup_for_appendToLog(logHours, name_of_test)
+    # currentTime_test=str(time.time()).split('.')[0]
+    # ONE_HOUR = 60*60
+    # logHours.currentTime=str(float(currentTime_test) - ONE_HOUR)
+    # logHours.readableTime = time.strftime('(%Y-%m-%d %H:%M:%S)', time.localtime(float(logHours.currentTime)))
+    # sample_text = name_of_test + ' pyTest at: ' + str(logHours.currentTime)+ '  ' + logHours.readableTime + "\n"
+    # logHours.title = name_of_test
+
     logHours.appendToLog(sample_text)
     smallDelta = 1
     logHours.difference = logHours.scanTime - smallDelta
@@ -256,15 +265,16 @@ def test_getTimes(logHours):
     import inspect
     #START SETUP
     logHours.initializeInternalVariables()
-    #should have been done in initializeInternalVariables: logHours.setFolderPath()
-    name_of_test = inspect.stack()[0][3]
-    logHours.title = name_of_test
-    #Append dummy data
-    currentTime_test = str(time.time()).split('.')[0]
-    logHours.currentTime = currentTime_test
-    logHours.readableTime = time.strftime('(%Y-%m-%d %H:%M:%S)', time.localtime(float(logHours.currentTime)))
-    pyTest_lastTime = name_of_test + ' pyTest at: ' + str(logHours.currentTime)+ '  ' + logHours.readableTime + "\n"
-    logHours.appendToLog(pyTest_lastTime)
+    name_of_test = inspect.stack()[0][3] #A little introspective hacking to get the name of this function.
+    sample_text = setup_for_appendToLog(logHours, name_of_test)
+
+    # logHours.title = name_of_test
+    # #Append dummy data
+    # currentTime_test = str(time.time()).split('.')[0]
+    # logHours.currentTime = currentTime_test
+    # logHours.readableTime = time.strftime('(%Y-%m-%d %H:%M:%S)', time.localtime(float(logHours.currentTime)))
+    #pyTest_lastTime = name_of_test + ' pyTest at: ' + str(logHours.currentTime)+ '  ' + logHours.readableTime + "\n"
+    logHours.appendToLog(sample_text)
 
     #Read in latested dummy data
     #logHours.readInLatestInfo() #REMOVED
@@ -273,23 +283,24 @@ def test_getTimes(logHours):
     time.sleep(1)
     #END SETUP
 
-    #RUN THE FUNCTION UNDER TESTING, this creates a new currentTime:
+    #RUN THE FUNCTION UNDER TEST, this creates a new currentTime:
     logHours.getTimes()
 
     #CHECK ASSERTS NOW
     #checking the "currentTime"
     actual = logHours.currentTime
-    #expected_currentTime = currentTime_test#str(time.time()).split('.')[0]
     expected_currentTime = str(time.time()).split('.')[0]
-    #assert actual == expected_currentTime
     assert logHours.currentTime <= expected_currentTime
 
     #checking the "lastTime"
     actual = logHours.lastTime
-    expected_lastTime = pyTest_lastTime.split(' ')[3]
+    expected_lastTime = sample_text.split(' ')[2]
     assert actual == expected_lastTime
 
     #checking the difference:
     actual = logHours.difference
     expected_difference = float(logHours.currentTime) - float(expected_lastTime)
     assert actual == expected_difference
+
+    #Assert the line has the proper number of columns (separated by spaces)
+    assert False
