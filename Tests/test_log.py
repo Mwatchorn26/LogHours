@@ -8,14 +8,14 @@ import inspect
 # Fixtures
 
 @pytest.fixture
-def logHours():
+def logHours_not_full_initialized():
     return LogHours()
 
 @pytest.fixture
-def logHours_internal_vars(logHours):
-    
+def logHours():
+    logHours = LogHours()
     logHours.initializeInternalVariables()
-    return LogHours()
+    return logHours
 
 def setup_for_appendToLog(logHours, name_of_test):
     currentTime_test=str(time.time()).split('.')[0]
@@ -35,7 +35,6 @@ def test_appendToLog(logHours):
     full_text = f"""Mary had a little lamb.
     Who's fleece was white as snow. Window: {logHours.title} \n"""
     print(full_text)
-    logHours.initializeInternalVariables()
     #should have been done in intitializeInternalvariables: logHours.setFolderPath()
     p = Path(logHours.files['allTaskChanges'])
     p.write_text("Mary had a little lamb.\n")
@@ -61,7 +60,6 @@ def test_checkForRestart(logHours):
     import time
 
     #Setup for assertion 1
-    logHours.initializeInternalVariables()
     #should have been done in intitializeInternalVariables: logHours.setFolderPath()
     #logHours.readInLatestInfo() #REMOVED
     logHours.readInAllChanges() #ADDED
@@ -112,9 +110,12 @@ def test_checkForRestart(logHours):
     #Make assertion 2
     assert actual == expected
 
-@pytest.mark.skip(reason="incomplete")
 def test_checkForTaskChangeAndLock(logHours):
-    pass
+    setup_for_appendToLog(logHours, "test_log - LogHours - Visual Studio Code")
+    logHours.appendToLog(textToLog)
+    logHours.checkForTaskChangeAndLock()
+
+
 
 @pytest.mark.skip(reason="incomplete")
 def test_fifteenMinuteLog(logHours):
@@ -129,33 +130,31 @@ def test_getActiveWindowTitle(logHours):
     assert actual == expected
 
 def test_getData(logHours):
-    logHours.initializeInternalVariables()
-    logHours.getData()
 
-    #logHours.readableTime[:5]
+    logHours_.getData()
+
+    #logHours_.readableTime[:5]
     #(2022-03-08 08:42:39)
     #0         1         2
     #012345678901234567890
-    assert logHours.readableTime[0] == '('
-    assert logHours.readableTime[1:4].isdigit()
-    assert logHours.readableTime[5] == '-'
-    assert logHours.readableTime[6:7].isdigit()
-    assert logHours.readableTime[8] == '-'
-    assert logHours.readableTime[9:10].isdigit()
-    assert logHours.readableTime[11] == ' '
-    assert logHours.readableTime[12:13].isdigit()
-    assert logHours.readableTime[14] == ':'
-    assert logHours.readableTime[15:16].isdigit()
-    assert logHours.readableTime[17] == ':'
-    assert logHours.readableTime[18:19].isdigit()
-    assert logHours.readableTime[20] == ')'
+    assert logHours_.readableTime[0] == '('
+    assert logHours_.readableTime[1:4].isdigit()
+    assert logHours_.readableTime[5] == '-'
+    assert logHours_.readableTime[6:7].isdigit()
+    assert logHours_.readableTime[8] == '-'
+    assert logHours_.readableTime[9:10].isdigit()
+    assert logHours_.readableTime[11] == ' '
+    assert logHours_.readableTime[12:13].isdigit()
+    assert logHours_.readableTime[14] == ':'
+    assert logHours_.readableTime[15:16].isdigit()
+    assert logHours_.readableTime[17] == ':'
+    assert logHours_.readableTime[18:19].isdigit()
+    assert logHours_.readableTime[20] == ')'
     
-
 def test_getTimes(logHours):
     import time
     import inspect
     #START SETUP
-    logHours.initializeInternalVariables()
     name_of_test = inspect.stack()[0][3] #A little introspective hacking to get the name of this function.
     sample_text = setup_for_appendToLog(logHours, name_of_test)
 
@@ -198,19 +197,19 @@ def test_getTimes(logHours):
     expected_length = 7
     assert actual == expected_length
 
-def test_initializeInternalVariables(logHours):
+def test_initializeInternalVariables(logHours_not_full_initialized):
     import os
     #logHours = LogHours()
-    logHours.initializeInternalVariables()
-    assert logHours.appPath == os.path.normpath("c:/Users/" + os.getlogin() + "/LogHours")
-    assert logHours.appPath == "c:\\Users\\m_wat\\LogHours"
-    assert logHours.scanTime == 60 #SECONDS BETWEEN UPDATES
-    assert logHours.previousTitle == ""
-    assert logHours.last15scans == {}
-    #assert LogHours.files=={'Temp':'','Hours':'','15minSummary':'','Summary':''}
-    #assert LogHours.setFolderPath() Asserted in it's own Test function.
-    assert logHours.lineList == ''
-    assert logHours.title == 'unassigned'
+    logHours_not_full_initialized.initializeInternalVariables()
+    assert logHours_not_full_initialized.appPath == os.path.normpath("c:/Users/" + os.getlogin() + "/LogHours")
+    assert logHours_not_full_initialized.appPath == "c:\\Users\\m_wat\\LogHours"
+    assert logHours_not_full_initialized.scanTime == 60 #SECONDS BETWEEN UPDATES
+    assert logHours_not_full_initialized.previousTitle == ""
+    assert logHours_not_full_initialized.last15scans == {}
+    #assert logHours_not_full_initialized.files=={'Temp':'','Hours':'','15minSummary':'','Summary':''}
+    #assert logHours_not_full_initialized.setFolderPath() Asserted in it's own Test function.
+    assert logHours_not_full_initialized.lineList == ''
+    assert logHours_not_full_initialized.title == 'unassigned'
     
 @pytest.mark.skip(reason="broken, and you'd have to send Win+L command to lock the system")
 def test_isSystemLocked(logHours):
@@ -261,7 +260,6 @@ def test_readInLatestInfo(logHours):
 	# # fileHandle.write("Mary had a little lamb.\n")
 	# # fileHandle.close()
     # sample_text = "Mary had a little lamb.\n"
-    # logHours.initializeInternalVariables()
     # p = Path(logHours.files['Latest'])
     # #os.remove(p)
     # Path.unlink(p)
@@ -284,7 +282,6 @@ def test_readInAllChanges(logHours):
     logHours.readableTime = time.strftime('(%Y-%m-%d %H:%M:%S)', time.localtime(float(logHours.currentTime)))
     sample_text = name_of_test + ' pyTest at: ' + str(logHours.currentTime)+ '  ' + logHours.readableTime + "\n"
 
-    logHours.initializeInternalVariables()
     p = Path(logHours.files['allTaskChanges'])
     #os.remove(p)
     Path.unlink(p)
@@ -299,10 +296,6 @@ def test_setFolderPath(logHours):
     #Setup
     import time
     day = time.strftime('%Y-%m-%d', time.localtime(time.time()))
-    logHours.initializeInternalVariables()
-
-    #Run setFolderPath
-    #should have been done in initializeInternalVariables(): logHours.setFolderPath()
 
     #Examine the results
     assert logHours.files['15minSummary'].upper() == os.path.normpath('C:/Users/' + os.getlogin() + '/LogHours/' + day + '/15minuteSummary.log').upper()
