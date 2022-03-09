@@ -176,7 +176,7 @@ class LogHours(object):
 		'''GET THE LAST RECORDED TIME, AND THE CURRENT TIME, AND THE DIFFERENCE'''
 		try:
 			last_line_in_file = str(self.lineList[-1])
-			time_in_ticks = last_line_in_file.split(' ')[3] # 4th item in the string
+			time_in_ticks = last_line_in_file.split(' ')[2] # 4th item in the string
 			self.lastTime = time_in_ticks
 			if not self.lastTime[:-2].isnumeric():
 				oneHourAgo = time.time() - (60*60)

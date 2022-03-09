@@ -303,4 +303,6 @@ def test_getTimes(logHours):
     assert actual == expected_difference
 
     #Assert the line has the proper number of columns (separated by spaces)
-    assert False
+    actual = len(sample_text.split(' '))
+    expected_length = 7
+    assert actual == expected_length
