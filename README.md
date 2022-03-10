@@ -6,6 +6,7 @@ A day's summary is provided where each application is listed once with the cumul
 This was meant to help me keep track of what I did each day so I could record it on my timesheets.
 
 ## TODO:
+* Use proper error logging rather than just throwing "Error occured" messages
 * Make Daylight saving work (or check my location, why is it 1hr off)
 * Tie in mouse and keyboard actions to ensure you're actually interacting with the computer.
 * Create a test that properly checks if the current time is retreived.
