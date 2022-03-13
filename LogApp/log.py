@@ -42,7 +42,7 @@ class LogHours(object):
 	def initializeInternalVariables(self):
 		'''SETUP ALL OUR BEGINNING STATE VARIABLES'''
 		self.appPath = os.path.normpath("c:/Users/" + os.getlogin() + "/LogHours/")
-		self.scanTime = 60 #SECONDS BETWEEN UPDATES
+		self.scanTime = 15 #60 #SECONDS BETWEEN UPDATES
 		self.previousTitle=""
 		self.last15scans={}
 		self.files={'15minSummary':'',
@@ -57,14 +57,14 @@ class LogHours(object):
 	def summarizeToday(self):
 		'''WRITE OUT A SUMMARY OF TODAY'S ACTIVIES, GROUPING INTO 15 MINUTE SEGMENTS'''
 		#READ IN TODAY'S TASKS INFO
-		fileHandle = open(files['15minSummary'],"r")
+		fileHandle = open(self.files['15minSummary'],"r")
 		self.lineList = fileHandle.readlines()
 		fileHandle.close()
 		self.taskList={}
 		self.calculateTodaysSummary()
 		self.writeTodaysSummaryToFile()
 
-	def calculateTodaysSummary():
+	def calculateTodaysSummary(self):
 		'''
 		Create a list of tasks for today
 		'''
@@ -73,11 +73,11 @@ class LogHours(object):
 			lineParts = line.split("Window:")
 			self.title = lineParts[1]
 			#UPDATE THE DICTIONARY WITH THIS TASK's TITLE 
-			if self.title in taskList:
-				self.taskList[title] = self.taskList[title]+1
+			if self.title in self.taskList:
+				self.taskList[self.title] = self.taskList[self.title]+1
 				#print('Incremented summary time spent on %s' % title)
 			else:
-				self.taskList[title]=1
+				self.taskList[self.title]=1
 				#print('Added new task: %s' % title)
 
 	def writeTodaysSummaryToFile(self):
@@ -256,12 +256,13 @@ class LogHours(object):
 
 	def fifteenMinuteLog(self):
 		'''IF IT'S BEEN MORE THAN 15 MINUTES...'''
-		if (sum(self.last15scans.values()) >= 15):
+		fifteen_minutes = 5
+		if (sum(self.last15scans.values()) >= fifteen_minutes):
 			mainTask = max(self.last15scans, key=lambda key: self.last15scans[key])
 			#print("\nPast 15 minutes, main task:%r\n" % mainTask)
 			self.last15scans={} #clear the scratch pad used to track the last 15 scans.
 			with open(self.files['15minSummary'],"a") as log:
-				log.write(str(self.currentTime)+ '  ' + self.readableTime + ' Window: ' + self.mainTask + "\n")
+				log.write(str(self.currentTime)+ '  ' + self.readableTime + ' Window: ' + mainTask + "\n")
 				log.close()
 			
 			sys.stdout.write("-")
@@ -269,7 +270,8 @@ class LogHours(object):
 
 	def writeLatestValuesToTempFile(self):
 		'''WRITE THE LATEST VALUES TO TEMPORARY FILE'''
-		with open(self.files['Latest'],"w") as temp:
+		#with open(self.files['Latest'],"w") as temp:
+		with open(self.files['allTaskChanges'],"a") as temp:
 			try:
 				temp.write(str(self.currentTime)+ '  ' + self.readableTime + ' Window: ' + self.title)
 			except:

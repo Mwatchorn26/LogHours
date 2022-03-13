@@ -111,9 +111,37 @@ def test_checkForRestart(logHours):
     assert actual == expected
 
 def test_checkForTaskChangeAndLock(logHours):
-    setup_for_appendToLog(logHours, "test_log - LogHours - Visual Studio Code")
+    window_title = "test_log - LogHours - Visual Studio Code"
+    textToLog = setup_for_appendToLog(logHours, window_title)
     logHours.appendToLog(textToLog)
     logHours.checkForTaskChangeAndLock()
+    logHours.readInAllChanges()
+    lastLog = logHours.lineList[-1].strip("\n")
+    assert window_title == lastLog[-len(window_title):]
+
+    # #Open Notepad
+    # from p-y-w-i-n-a-u-t-o-.-a-p-p-l-i-c-a-t-i-o-n- -i-m-p-o-r-t- -A-p-p-l-i-c-a-t-i-o-n
+    # app = Application().start("notepad.exe")
+    # app.UntitledNotepad.menu_select("File->New")
+    
+    # #Activate Notepad (may not be needed)
+    # import pygetwindow as gw
+    # win=gw.getWindowsWithTitle('Untitled - Notepad')[0]
+    # win.activate()
+    # # Run the Function under test:
+    # logHours.checkForTaskChangeAndLock()
+
+    # #We're done with the Notepad app, so exit it.
+    # MenuItms = app.window_(title_re = "Untitled - Notepad").MenuSelect("File->Exit")
+
+    # #Get a pointer to the this file (assuming VS Code), and activate it.
+    # win=gw.getWindowsWithTitle('test_log - LogHours - Visual Studio Code')[0]
+    # win.activate()
+
+    # #Check the results
+    # logHours.readInAllChanges()
+    # lastLog = logHours.lineList[-1].strip("\n")
+    # assert lastLog == 'Untitled - Notepad'
 
 
 
@@ -131,25 +159,27 @@ def test_getActiveWindowTitle(logHours):
 
 def test_getData(logHours):
 
-    logHours_.getData()
+    logHours.getData()
 
     #logHours_.readableTime[:5]
     #(2022-03-08 08:42:39)
     #0         1         2
     #012345678901234567890
-    assert logHours_.readableTime[0] == '('
-    assert logHours_.readableTime[1:4].isdigit()
-    assert logHours_.readableTime[5] == '-'
-    assert logHours_.readableTime[6:7].isdigit()
-    assert logHours_.readableTime[8] == '-'
-    assert logHours_.readableTime[9:10].isdigit()
-    assert logHours_.readableTime[11] == ' '
-    assert logHours_.readableTime[12:13].isdigit()
-    assert logHours_.readableTime[14] == ':'
-    assert logHours_.readableTime[15:16].isdigit()
-    assert logHours_.readableTime[17] == ':'
-    assert logHours_.readableTime[18:19].isdigit()
-    assert logHours_.readableTime[20] == ')'
+    assert logHours.readableTime[0] == '('
+    assert logHours.readableTime[1:4].isdigit()
+    assert logHours.readableTime[5] == '-'
+    assert logHours.readableTime[6:7].isdigit()
+    assert logHours.readableTime[8] == '-'
+    assert logHours.readableTime[9:10].isdigit()
+    assert logHours.readableTime[11] == ' '
+    assert logHours.readableTime[12:13].isdigit()
+    assert logHours.readableTime[14] == ':'
+    assert logHours.readableTime[15:16].isdigit()
+    assert logHours.readableTime[17] == ':'
+    assert logHours.readableTime[18:19].isdigit()
+    assert logHours.readableTime[20] == ')'
+    
+       
     
 def test_getTimes(logHours):
     import time
