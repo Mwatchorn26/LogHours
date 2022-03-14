@@ -60,19 +60,12 @@ def test_checkForRestart(logHours):
     import time
 
     #Setup for assertion 1
-    #should have been done in intitializeInternalVariables: logHours.setFolderPath()
     #logHours.readInLatestInfo() #REMOVED
     logHours.readInAllChanges() #ADDED
     logHours.getTimes()
 
     name_of_test = inspect.stack()[0][3]
     sample_text = setup_for_appendToLog(logHours, name_of_test)
-    # currentTime_test=str(time.time()).split('.')[0]
-    # ONE_HOUR = 60*60
-    # logHours.currentTime=str(float(currentTime_test) - ONE_HOUR)
-    # logHours.readableTime = time.strftime('(%Y-%m-%d %H:%M:%S)', time.localtime(float(logHours.currentTime)))
-    # sample_text = name_of_test + ' pyTest at: ' + str(logHours.currentTime)+ '  ' + logHours.readableTime + "\n"
-    # logHours.title = name_of_test
 
     logHours.appendToLog(sample_text)
     smallDelta = 1
@@ -188,13 +181,7 @@ def test_getTimes(logHours):
     name_of_test = inspect.stack()[0][3] #A little introspective hacking to get the name of this function.
     sample_text = setup_for_appendToLog(logHours, name_of_test)
 
-    # logHours.title = name_of_test
-    # #Append dummy data
-    # currentTime_test = str(time.time()).split('.')[0]
-    # logHours.currentTime = currentTime_test
-    # logHours.readableTime = time.strftime('(%Y-%m-%d %H:%M:%S)', time.localtime(float(logHours.currentTime)))
-    #pyTest_lastTime = name_of_test + ' pyTest at: ' + str(logHours.currentTime)+ '  ' + logHours.readableTime + "\n"
-    logHours.appendToLog(sample_text)
+       logHours.appendToLog(sample_text)
 
     #Read in latested dummy data
     #logHours.readInLatestInfo() #REMOVED
