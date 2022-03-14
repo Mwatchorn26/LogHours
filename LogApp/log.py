@@ -13,11 +13,20 @@ import win32con
 import win32evtlog
 import win32security
 import win32evtlogutil
- 
+
+TEST = False
+
 class LogHours(object):
 	def __init__(self):
 		self.cleanBrowser = True
 		self.title = 'unassigned'
+		if TEST:
+			#reduce times
+			fifteen_minutes=5	# SUMMARY PERIOD
+			self.scantime = 15  # SECONDS BETWEEN UPDATES
+		else:
+			fifteen_minutes=15	# SUMMARY PERIOD
+			self.scantime = 60	# SECONDS BETWEEN UPDATES
 
 	def EventLogReportEvent(self):
 		'''
@@ -42,7 +51,7 @@ class LogHours(object):
 	def initializeInternalVariables(self):
 		'''SETUP ALL OUR BEGINNING STATE VARIABLES'''
 		self.appPath = os.path.normpath("c:/Users/" + os.getlogin() + "/LogHours/")
-		self.scanTime = 15 #60 #SECONDS BETWEEN UPDATES
+		# moved to __init__: self.scanTime = 15 #60 #SECONDS BETWEEN UPDATES
 		self.previousTitle=""
 		self.last15scans={}
 		self.files={'15minSummary':'',
