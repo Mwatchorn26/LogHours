@@ -53,7 +53,7 @@ def test_appendToLog(logHours):
 @pytest.mark.skip(reason="incomplete")
 def test_calculateTodaysSummary():
     pass
-
+ 
 def test_checkForRestart(logHours):
     from pathlib import Path
     import inspect
@@ -140,7 +140,44 @@ def test_checkForTaskChangeAndLock(logHours):
 
 @pytest.mark.skip(reason="incomplete")
 def test_fifteenMinuteLog(logHours):
-    pass
+    #I recall there is a better way to do this, and I hope to get to it.
+    exptected = "Main_Task"
+    data_set_1 = ["Main_Task"]
+    data_set_2 = ["Main_Task", "Task_2", "Main_Task"]
+    data_set_3 = ["Main_Task", "Task_2", "Main_Task", "Task_2"]
+    data_set_4 = ["Main_Task", "Task_2", "Main_Task", "Task_3"]
+    data_set_5 = ["Main_Task", "Task_2", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task"]
+    #Equal Main_Task & Task_3:
+    data_set_6 = ["Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task"]
+    #16 items, rather than 15:
+    data_set_7 = ["Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3"]
+    
+
+    for task in data_set_1:
+        logHours.appendToLog(task)
+    actual = fifteenMinuteLog() #TODO I don't think fifteenMinuteLog will return the most prominent task,.. but if it did, then this would be easier.
+    assert expected == actual
+    clear_log()
+
+    logHours.appendToLog("Task 2")      # minute 5
+    logHours.appendToLog("Main Task")   # minute 6
+    
+    #run test here (even count):
+    exptected = "Main Task"
+    actual = fifteenMinuteLog()
+    assert expected == actual
+
+    logHours.appendToLog("Task 4")      # minute 7
+    logHours.appendToLog("Main Task")   # minute 8
+    logHours.appendToLog("Task 5")      # minute 9
+    logHours.appendToLog("Main Task")   # minute 10
+    logHours.appendToLog("Main Task")   # minute 11
+    logHours.appendToLog("Main Task")   # minute 12
+    logHours.appendToLog("Task 6")      # minute 13
+    logHours.appendToLog("Main Task")   # minute 14
+    logHours.appendToLog("Main Task")   # minute 15
+    
+
 
 def test_getActiveWindowTitle(logHours):
     '''Compare [expected] hard-coded expected value to [actual] code result. Test title expected'''
