@@ -276,6 +276,9 @@ class LogHours(object):
 			
 			sys.stdout.write("-")
 			sys.stdout.flush()
+			return True, mainTask
+		else:
+			return False, "" 
 
 	def writeLatestValuesToTempFile(self):
 		'''WRITE THE LATEST VALUES TO TEMPORARY FILE'''

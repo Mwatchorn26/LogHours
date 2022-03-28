@@ -17,6 +17,9 @@ def logHours():
     logHours.initializeInternalVariables()
     return logHours
 
+
+
+
 def setup_for_appendToLog(logHours, name_of_test):
     currentTime_test=str(time.time()).split('.')[0]
     ONE_HOUR = 60*60
@@ -138,44 +141,71 @@ def test_checkForTaskChangeAndLock(logHours):
 
 
 
-@pytest.mark.skip(reason="incomplete")
-def test_fifteenMinuteLog(logHours):
-    #I recall there is a better way to do this, and I hope to get to it.
-    exptected = "Main_Task"
-    data_set_1 = ["Main_Task"]
-    data_set_2 = ["Main_Task", "Task_2", "Main_Task"]
-    data_set_3 = ["Main_Task", "Task_2", "Main_Task", "Task_2"]
-    data_set_4 = ["Main_Task", "Task_2", "Main_Task", "Task_3"]
-    data_set_5 = ["Main_Task", "Task_2", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task"]
+@pytest.fixture
+def data_set_fxtr():
+    data_sets[1] = [False, '', ["Main_Task"]]
+    data_sets[2] = [False, '', ["Main_Task", "Task_2", "Main_Task"]]
+    data_sets[3] = [False, '', ["Main_Task", "Task_2", "Main_Task", "Task_2"]]
+    data_sets[4] = [False, '', ["Main_Task", "Task_2", "Main_Task", "Task_3"]]
+    data_sets[5] = [False, '', ["Main_Task", "Task_2", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task"]]
+    #Main_Task is one more than Task_3:
+    data_sets[6] = [True, 'Main_Task', ["Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task"]]
     #Equal Main_Task & Task_3:
-    data_set_6 = ["Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task"]
-    #16 items, rather than 15:
-    data_set_7 = ["Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3"]
+    data_sets[7] = [True, 'Task_3', ["Task_2", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task"]]
     
+    #16 items, rather than 15:
+    data_sets[8] = [False, '', ["Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3", "Main_Task", "Task_3"]]
+    
+    #data_sets = [data_set_1, data_set_2, data_set_3, data_set_4, data_set_5, data_set_6, data_set_7, data_set_8]
+    return data_sets
 
-    for task in data_set_1:
+def clear_log():
+    '''
+    This is a helper function for the following test.
+    As it implies it clears the log [ that gets generated during the function call.]
+    I know there's a way to use tempdir to avoid this... I'll look into it tomorrow.
+    '''
+    pass
+
+@pytest.mark.parametrize("logHours, data_sets, data_set_index", [(logHours, data_set_fxtr(), 1), 
+                                                        (logHours, data_set_fxtr(), 2), 
+                                                        (logHours, data_set_fxtr(), 3), 
+                                                        (logHours, data_set_fxtr(), 4), 
+                                                        (logHours, data_set_fxtr(), 5), 
+                                                        (logHours, data_set_fxtr(), 6), 
+                                                        (logHours, data_set_fxtr(), 7), 
+                                                        (logHours, data_set_fxtr(), 8)])
+def test_fifteenMinuteLog(logHours, data_sets, data_set_index):
+    data_set_meta = data_sets[data_set_index]
+    valid = data_set_meta[0]
+    expected = data_set_meta[1]
+    data_set = data_set_meta[2]
+    
+    for task in data_set:
         logHours.appendToLog(task)
-    actual = fifteenMinuteLog() #TODO I don't think fifteenMinuteLog will return the most prominent task,.. but if it did, then this would be easier.
-    assert expected == actual
+    
+    _, actual = fifteenMinuteLog() #TODO I don't think fifteenMinuteLog will return the most prominent task,.. but if it did, then this would be easier.
+    if valid:
+        assert expected == actual
     clear_log()
 
-    logHours.appendToLog("Task 2")      # minute 5
-    logHours.appendToLog("Main Task")   # minute 6
+    # logHours.appendToLog("Task 2")      # minute 5
+    # logHours.appendToLog("Main Task")   # minute 6
     
-    #run test here (even count):
-    exptected = "Main Task"
-    actual = fifteenMinuteLog()
-    assert expected == actual
+    # #run test here (even count):
+    # exptected = "Main Task"
+    # actual = fifteenMinuteLog()
+    # assert expected == actual
 
-    logHours.appendToLog("Task 4")      # minute 7
-    logHours.appendToLog("Main Task")   # minute 8
-    logHours.appendToLog("Task 5")      # minute 9
-    logHours.appendToLog("Main Task")   # minute 10
-    logHours.appendToLog("Main Task")   # minute 11
-    logHours.appendToLog("Main Task")   # minute 12
-    logHours.appendToLog("Task 6")      # minute 13
-    logHours.appendToLog("Main Task")   # minute 14
-    logHours.appendToLog("Main Task")   # minute 15
+    # logHours.appendToLog("Task 4")      # minute 7
+    # logHours.appendToLog("Main Task")   # minute 8
+    # logHours.appendToLog("Task 5")      # minute 9
+    # logHours.appendToLog("Main Task")   # minute 10
+    # logHours.appendToLog("Main Task")   # minute 11
+    # logHours.appendToLog("Main Task")   # minute 12
+    # logHours.appendToLog("Task 6")      # minute 13
+    # logHours.appendToLog("Main Task")   # minute 14
+    # logHours.appendToLog("Main Task")   # minute 15
     
 
 
@@ -218,7 +248,7 @@ def test_getTimes(logHours):
     name_of_test = inspect.stack()[0][3] #A little introspective hacking to get the name of this function.
     sample_text = setup_for_appendToLog(logHours, name_of_test)
 
-       logHours.appendToLog(sample_text)
+    logHours.appendToLog(sample_text)
 
     #Read in latested dummy data
     #logHours.readInLatestInfo() #REMOVED
